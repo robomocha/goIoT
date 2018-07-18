@@ -9,7 +9,7 @@ GPIO.setmode(GPIO.BCM)
 # set GPIO Pins
 pinTrigger = 18
 pinEcho = 24
-
+closer = 2
 def close(signal, frame):
 	print("\nTurning off ultrasonic distance detection...\n")
 	GPIO.cleanup() 
@@ -19,6 +19,7 @@ signal.signal(signal.SIGINT, close)
 
 # set GPIO input and output channels
 GPIO.setup(pinTrigger, GPIO.OUT)
+GPIO.setup(closer, GPIO.OUT)
 GPIO.setup(pinEcho, GPIO.IN)
 distance = 0
 distance2 = 0
@@ -50,9 +51,12 @@ while True:
 		else:
 			distance2 = round((TimeElapsed *34300)/2,0)
 			print ("Distance1: "+str(distance)+ "Distance2: "+ str(distance2))
-		time.sleep(0.05)
-	if distance - distance2 > 0 and distance - distance2 < 10:
-		print ("object is moving futher away")
-	elif distance - distance2 < 0 and distance - distance2 > -10:
+		time.sleep(0.25)
+
+	if distance - distance2 > 5:
+		print ("object is moving further")
+		GPIO.output(closer, False)
+	elif distance - distance2 < -5:
 		print("object is moving closer")
+		GPIO.output(closer, True)
 
