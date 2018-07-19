@@ -12,25 +12,26 @@ def close(signal, frame):
 signal.signal(signal.SIGINT, close)
 
 def calcDistance():
+	# send burst of UV waves
 	# set Trigger to HIGH
 	GPIO.output(pinTrigger, True)
-	# set Trigger after 0.01ms to LOW
 	time.sleep(0.00001)
+	# set Trigger after 0.01ms to LOW
 	GPIO.output(pinTrigger, False)
 
-	startTime = time.time()
-	stopTime = time.time()
+	sendTime = time.time()
+	rxTime = time.time()
 
 	# save start time
 	while 0 == GPIO.input(pinEcho):
-		startTime = time.time()
+		sendTime = time.time()
 
 	# save time of arrival
 	while 1 == GPIO.input(pinEcho):
-		stopTime = time.time()
+		rxTime = time.time()
 
 	# time difference between start and arrival
-	TimeElapsed = stopTime - startTime
+	TimeElapsed = sendTime - rxTime
 	# multiply with the sonic speed (34300 cm/s)
 	# and divide by 2, because there and back
 	# Distance = Speed(34300 cm/s) * Time 
@@ -43,7 +44,7 @@ def calcDistance():
 # use Raspberry Pi board pin numbers
 GPIO.setmode(GPIO.BCM)
 
-# set GPIO Pins
+# GPIO Pins
 pinTrigger = 18
 pinEcho = 24
 closer = 2
@@ -52,22 +53,37 @@ closer = 2
 GPIO.setup(pinTrigger, GPIO.OUT)
 GPIO.setup(closer, GPIO.OUT)
 GPIO.setup(pinEcho, GPIO.IN)
+
 distance = 0
 distance2 = 0
 
-while True:	
+while True:
+	# get distance of object, to check if object coming near or going far
 	distance = calcDistance()
 	time.sleep(0.05)
 	distance2 = calcDistance()
-	print ("Distance1: "+str(distance)+ "Distance2: "+ str(distance2))
-	time.sleep(0.25)
 	
+	print ("Distance1: "+str(distance)+ " Distance2: "+ str(distance2))
+	
+	# Usecase1: either of distances < 15 cms.
 	if distance < 15 or distance2 < 15:
 		print("OBJECT IN CLOSE PROXIMITY")
+		# beep, for now turn on the LED <TODO>
+	
+	# Usecase2: if object is coming very near then start bliking LED plus a sound
 	if distance - distance2 > 1:
-		print ("object is moving further")
+		print ("object is moving further") # stop bliking <TODO>
 		GPIO.output(closer, False)
 	elif distance - distance2 < -2:
-		print("object is moving closer")
+		print("object is moving closer") #start blinking <TODO>
 		GPIO.output(closer, True)
+	
+	# Usecase3: tell user that I am alive, on every 5th min
+		# check battery remaining power
+	# for now, blink green LED
+	
+	# Usecase4: get whether updates, on every 10th min, based on the location
+	
+	# sleep before next iteration
+	time.sleep(0.25)
 
