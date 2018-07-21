@@ -36,7 +36,7 @@ def calcDistance():
 	# and divide by 2, because there and back
 	# Distance = Speed(34300 cm/s) * Time 
 	
-	distance = round((TimeElapsed * 34300) / 2, 0)
+	distance = round(-1*(TimeElapsed * 34300) / 2, 0)
 	
 	return distance
 	
@@ -48,15 +48,17 @@ GPIO.setmode(GPIO.BCM)
 pinTrigger = 18
 pinEcho = 24
 closer = 2
+reminder = 3
 
 # set GPIO input and output channels
 GPIO.setup(pinTrigger, GPIO.OUT)
 GPIO.setup(closer, GPIO.OUT)
+GPIO.setup(reminder, GPIO.OUT)
 GPIO.setup(pinEcho, GPIO.IN)
 
 distance = 0
 distance2 = 0
-
+x = 0
 while True:
 	# get distance of object, to check if object coming near or going far
 	distance = calcDistance()
@@ -71,19 +73,26 @@ while True:
 		# beep, for now turn on the LED <TODO>
 	
 	# Usecase2: if object is coming very near then start bliking LED plus a sound
-	if distance - distance2 > 1:
+	if distance == distance2:
+		print("  ")
+		GPIO.output(closer, False)
+	elif distance - distance2 < 1:
 		print ("object is moving further") # stop bliking <TODO>
 		GPIO.output(closer, False)
-	elif distance - distance2 < -2:
+	elif distance - distance2 > -2:
 		print("object is moving closer") #start blinking <TODO>
 		GPIO.output(closer, True)
 	
 	# Usecase3: tell user that I am alive, on every 5th min
 		# check battery remaining power
 	# for now, blink green LED
-	
+	if x == 0:
+		GPIO.output(reminder, True)
+		x = 1
+	else:
+		GPIO.output(reminder, False)
+		x=0
 	# Usecase4: get whether updates, on every 10th min, based on the location
 	
 	# sleep before next iteration
 	time.sleep(0.25)
-
