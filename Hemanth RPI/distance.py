@@ -70,11 +70,16 @@ while True:
 	# Usecase1: either of distances < 15 cms.
 	if distance < 15 or distance2 < 15:
 		print("OBJECT IN CLOSE PROXIMITY")
+		GPIO.output(reminder, True)
+		GPIO.output(closer, True)
+	else
+		GPIO.output(reminder, False)
+		GPIO.output(closer, False)
 		# beep, for now turn on the LED <TODO>
 	
 	# Usecase2: if object is coming very near then start bliking LED plus a sound
 	if distance == distance2:
-		print("  ")
+		p
 		GPIO.output(closer, False)
 	elif distance - distance2 < 1:
 		print ("object is moving further") # stop bliking <TODO>
